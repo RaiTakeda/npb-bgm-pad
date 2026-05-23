@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NPB応援歌プレイリスト</title>
+
+<style>
+:root{
+  --bg:#0b0f14;
+  --panel:#121a24;
+  --panel2:#0f1620;
+  --text:#eaf1ff;
+  --muted:#9fb0c7;
+  --accent:#2dd4bf;
+  --danger:#fb7185;
+  --btn:#1b2736;
+  --btnActive:#20344a;
+  --radius:16px;
+  --gap:14px;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, "Noto Sans JP", Meiryo, sans-serif;
+  background: radial-gradient(1200px 800px at 50% -10%, #18304a 0%, var(--bg) 55%);
+  color:var(--text);
+}
+
+.wrap{
+  max-width:520px;
+  margin:0 auto;
+  padding:12px;
+  padding-bottom:150px;
+}
+
+body.playlist-open .wrap{
+  padding-bottom:430px;
+}
+
+h1{
+  margin:0;
+  font-size:18px;
+}
+
+.hint{
+  font-size:12px;
+  color:var(--muted);
+  margin:6px 0 12px;
+}
+
+.category{
+  background:linear-gradient(180deg,var(--panel),var(--panel2));
+  border-radius:var(--radius);
+  margin-bottom:12px;
+  overflow:hidden;
+  box-shadow:0 8px 18px rgba(0,0,0,.25);
+}
+
+.category-header{
+  width:100%;
+  background:var(--btn);
+  color:var(--text);
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:10px;
+  padding:16px;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.category-header.open{
+  background:var(--btnActive);
+  outline:2px solid var(--accent);
+  outline-offset:-2px;
+}
+
+.team-check{
+  width:24px;
+  height:24px;
+  accent-color:var(--accent);
+}
+
+.team-name{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+
+.team-sub{
+  font-size:11px;
+  color:var(--muted);
+  font-weight:500;
+}
+
+.arrow{
+  color:var(--accent);
+  font-size:16px;
+}
+
+.song-list{
+  display:none;
+  padding:10px;
+}
+
+.song-row{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:10px;
+  padding:12px 6px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  cursor:pointer;
+}
+
+.song-row:last-child{
+  border-bottom:none;
+}
+
+.song-row.selected{
+  background:rgba(45,212,191,.08);
+  border-radius:12px;
+}
+
+.song-row input{
+  width:24px;
+  height:24px;
+  accent-color:var(--accent);
+}
+
+.song-title{
+  font-size:15px;
+  font-weight:600;
+}
+
+.song-note{
+  font-size:11px;
+  color:var(--muted);
+  margin-top:2px;
+}
+
+button{
+  border:none;
+  border-radius:14px;
+  background:var(--btn);
+  color:var(--text);
+  font-size:15px;
+  font-weight:600;
+  padding:14px 8px;
+  min-height:56px;
+  box-shadow:0 6px 14px rgba(0,0,0,.2);
+  width:100%;
+}
+
+button:active{
+  transform:translateY(1px);
+}
+
+button.small-play{
+  width:58px;
+  min-height:44px;
+  padding:8px;
+  font-size:14px;
+  background:#18304a;
+}
+
+button.primary{
+  background:#0f766e;
+}
+
+button.clear,
+button.stop-btn{
+  background:#5b1d2a;
+}
+
+button.sub{
+  background:#26364a;
+}
+
+button.move{
+  width:36px;
+  min-height:34px;
+  padding:4px;
+  font-size:15px;
+  border-radius:10px;
+  box-shadow:none;
+}
+
+button.move:disabled{
+  opacity:.35;
+}
+
+.bottom-fixed{
+  position:fixed;
+  left:50%;
+  bottom:0;
+  transform:translateX(-50%);
+  width:100%;
+  max-width:520px;
+  padding:0 12px calc(10px + env(safe-area-inset-bottom));
+  background:rgba(11,15,20,.94);
+  backdrop-filter:blur(10px);
+  z-index:50;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+
+.playlist-panel{
+  background:linear-gradient(180deg,var(--panel),var(--panel2));
+  border-radius:16px 16px 12px 12px;
+  margin-top:10px;
+  margin-bottom:10px;
+  overflow:hidden;
+  box-shadow:0 8px 18px rgba(0,0,0,.25);
+}
+
+.playlist-head{
+  display:grid;
+  grid-template-columns:1fr 92px 42px;
+  gap:8px;
+  align-items:center;
+  background:var(--btn);
+  padding:8px;
+}
+
+.playlist-toggle{
+  border:none;
+  background:transparent;
+  color:var(--text);
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  gap:2px;
+  padding:6px 8px;
+  min-height:44px;
+  border-radius:10px;
+  box-shadow:none;
+  text-align:left;
+}
+
+.playlist-toggle-title{
+  font-size:14px;
+  font-weight:700;
+}
+
+.playlist-toggle-sub{
+  color:var(--muted);
+  font-size:11px;
+  font-weight:500;
+}
+
+.playlist-head-play{
+  min-height:44px;
+  padding:8px;
+  font-size:13px;
+  border-radius:12px;
+  background:#0f766e;
+}
+
+.playlist-arrow-btn{
+  min-height:44px;
+  padding:8px;
+  font-size:16px;
+  border-radius:12px;
+  box-shadow:none;
+  background:#26364a;
+}
+
+.playlist-body{
+  display:none;
+  padding:10px;
+  max-height:42vh;
+  overflow-y:auto;
+}
+
+.playlist-panel.open .playlist-body{
+  display:block;
+}
+
+.playlist-actions-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:10px;
+}
+
+.playlist-empty{
+  color:var(--muted);
+  font-size:13px;
+  padding:10px 4px;
+}
+
+.playlist-list{
+  list-style:none;
+  margin:0;
+  padding:0;
+}
+
+.playlist-item{
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:center;
+  gap:8px;
+  padding:8px 4px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.playlist-item:last-child{
+  border-bottom:none;
+}
+
+.playlist-item-title{
+  font-size:13px;
+  font-weight:600;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.playlist-moves{
+  display:flex;
+  gap:6px;
+}
+
+.control-bar{
+  display:grid;
+  grid-template-columns:1fr 1.6fr;
+  gap:var(--gap);
+}
+
+.now{
+  background:rgba(255,255,255,.05);
+  border-radius:14px;
+  padding:10px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  min-width:0;
+}
+
+.now .label{
+  font-size:11px;
+  color:var(--muted);
+}
+
+.now .title{
+  font-size:14px;
+  font-weight:700;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:140px;
+  transform:translateX(-50%);
+  background:rgba(15,22,32,.95);
+  color:var(--text);
+  border:1px solid rgba(45,212,191,.45);
+  border-radius:999px;
+  padding:10px 16px;
+  font-size:13px;
+  box-shadow:0 8px 20px rgba(0,0,0,.35);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .2s ease, transform .2s ease;
+  z-index:60;
+  max-width:90%;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(-4px);
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+  <h1>NPB応援歌プレイリスト</h1>
+  <p class="hint">チーム横のチェックで一括追加。曲ごとのチェックONで追加、OFFでリストから外します。▶は単品ループ再生用です。</p>
+
+  <div id="categories"></div>
+</div>
+
+<div class="bottom-fixed">
+
+  <section class="playlist-panel" id="playlistPanel">
+    <div class="playlist-head">
+      <button class="playlist-toggle" onclick="togglePlaylistPanel()">
+        <span class="playlist-toggle-title">再生リスト</span>
+        <span class="playlist-toggle-sub" id="playlistCount">0曲</span>
+      </button>
+
+      <button class="playlist-head-play" onclick="playPlaylist()">リスト再生</button>
+
+      <button class="playlist-arrow-btn" onclick="togglePlaylistPanel()" id="playlistArrow">▲</button>
+    </div>
+
+    <div class="playlist-body">
+      <div class="playlist-actions-row">
+        <button class="sub" onclick="shufflePlaylist()">ランダム入れ替え</button>
+        <button class="clear" onclick="clearPlaylist()">リストをクリア</button>
+      </div>
+
+      <div class="playlist-empty" id="emptyMessage">まだ曲が追加されていません</div>
+      <ol class="playlist-list" id="playlist"></ol>
+    </div>
+  </section>
+
+  <div class="control-bar">
+    <button class="stop-btn" id="stopBtn">停止</button>
+    <div class="now">
+      <div class="label">再生中</div>
+      <div class="title" id="nowPlaying">（なし）</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast">追加しました</div>
+
+<script>
+const TEAM_ORDER = [
+  { team: "巨人", sub: "読売ジャイアンツ" },
+  { team: "ヤクルト", sub: "東京ヤクルトスワローズ" },
+  { team: "横浜", sub: "横浜DeNAベイスターズ" },
+  { team: "中日", sub: "中日ドラゴンズ" },
+  { team: "阪神", sub: "阪神タイガース" },
+  { team: "広島", sub: "広島東洋カープ" },
+  { team: "日本ハム", sub: "北海道日本ハムファイターズ" },
+  { team: "楽天", sub: "東北楽天ゴールデンイーグルス" },
+  { team: "西武", sub: "埼玉西武ライオンズ" },
+  { team: "ロッテ", sub: "千葉ロッテマリーンズ" },
+  { team: "オリックス", sub: "オリックス・バファローズ" },
+  { team: "ソフトバンク", sub: "福岡ソフトバンクホークス" }
+];
+
+const SAMPLE_TRACKS = [
+  { team:"巨人", title:"巨人 応援歌 01", file:"audio/giants/giants01.mp3", volume:1.0 },
+  { team:"巨人", title:"巨人 チャンステーマ", file:"audio/giants/chance01.mp3", volume:0.9 },
+
+  { team:"ヤクルト", title:"ヤクルト 応援歌 01", file:"audio/swallows/swallows01.mp3", volume:1.0 },
+  { team:"ヤクルト", title:"ヤクルト チャンステーマ", file:"audio/swallows/chance01.mp3", volume:0.9 },
+
+  { team:"横浜", title:"横浜 応援歌 01", file:"audio/baystars/baystars01.mp3", volume:1.0 },
+  { team:"横浜", title:"横浜 チャンステーマ", file:"audio/baystars/chance01.mp3", volume:0.9 },
+
+  { team:"中日", title:"中日 応援歌 01", file:"audio/dragons/dragons01.mp3", volume:1.0 },
+  { team:"中日", title:"中日 チャンステーマ", file:"audio/dragons/chance01.mp3", volume:0.9 },
+
+  { team:"阪神", title:"阪神 応援歌 01", file:"audio/tigers/tigers01.mp3", volume:1.0 },
+  { team:"阪神", title:"阪神 チャンステーマ", file:"audio/tigers/chance01.mp3", volume:0.9 },
+
+  { team:"広島", title:"広島 応援歌 01", file:"audio/carp/carp01.mp3", volume:1.0 },
+  { team:"広島", title:"広島 チャンステーマ", file:"audio/carp/chance01.mp3", volume:0.85 },
+
+  { team:"日本ハム", title:"日本ハム 応援歌 01", file:"audio/fighters/fighters01.mp3", volume:1.0 },
+  { team:"日本ハム", title:"日本ハム チャンステーマ", file:"audio/fighters/chance01.mp3", volume:0.9 },
+
+  { team:"楽天", title:"楽天 応援歌 01", file:"audio/eagles/eagles01.mp3", volume:1.0 },
+  { team:"楽天", title:"楽天 チャンステーマ", file:"audio/eagles/chance01.mp3", volume:0.9 },
+
+  { team:"西武", title:"西武 応援歌 01", file:"audio/lions/lions01.mp3", volume:1.0 },
+  { team:"西武", title:"西武 チャンステーマ", file:"audio/lions/chance01.mp3", volume:0.9 },
+
+  { team:"ロッテ", title:"ロッテ 応援歌 01", file:"audio/marines/marines01.mp3", volume:1.0 },
+  { team:"ロッテ", title:"ロッテ チャンステーマ", file:"audio/marines/chance01.mp3", volume:0.9 },
+
+  { team:"オリックス", title:"オリックス 応援歌 01", file:"audio/buffaloes/buffaloes01.mp3", volume:1.0 },
+  { team:"オリックス", title:"オリックス チャンステーマ", file:"audio/buffaloes/chance01.mp3", volume:0.9 },
+
+  { team:"ソフトバンク", title:"ソフトバンク 応援歌 01", file:"audio/hawks/hawks01.mp3", volume:1.0 },
+  { team:"ソフトバンク", title:"ソフトバンク チャンステーマ", file:"audio/hawks/chance01.mp3", volume:0.9 }
+];
+
+let allTracks = [];
+let playlist = [];
+
+let mode = "stopped";
+let currentPlaylistIndex = 0;
+let isPlaylistPanelOpen = false;
+
+async function init() {
+  allTracks = await loadTracks();
+  renderCategories();
+  syncAllCheckboxStates();
+  renderPlaylist();
+}
+
+async function loadTracks() {
+  try {
+    const response = await fetch("data/tracks.json", { cache: "no-store" });
+
+    if (!response.ok) {
+      throw new Error("tracks.json not found");
+    }
+
+    const data = await response.json();
+    const normalized = normalizeTracks(data);
+
+    if (normalized.length === 0) {
+      throw new Error("tracks.json is empty");
+    }
+
+    return normalized;
+
+  } catch (error) {
+    console.warn("data/tracks.json を読み込めなかったため、サンプルデータで表示します。", error);
+    return normalizeTracks(SAMPLE_TRACKS);
+  }
+}
+
+function normalizeTracks(rawTracks) {
+  return rawTracks.map((track, index) => {
+    const teamInfo = TEAM_ORDER.find(t => t.team === track.team);
+
+    return {
+      id: track.id || `${track.team}-${index}`,
+      team: track.team,
+      teamFull: track.teamFull || track.sub || (teamInfo ? teamInfo.sub : ""),
+      title: track.title || `曲 ${index + 1}`,
+      file: track.file || "",
+      volume: typeof track.volume === "number" ? track.volume : 1.0
+    };
+  });
+}
+
+function renderCategories() {
+  const wrapper = document.getElementById("categories");
+  wrapper.innerHTML = "";
+
+  TEAM_ORDER.forEach((teamInfo, groupIndex) => {
+    const tracks = allTracks.filter(track => track.team === teamInfo.team);
+
+    const category = document.createElement("div");
+    category.className = "category";
+
+    const header = document.createElement("div");
+    header.className = "category-header";
+    header.id = `category-header-${groupIndex}`;
+    header.onclick = (event) => {
+      if (event.target.closest("input")) return;
+      toggleCategory(groupIndex);
+    };
+
+    const teamCheck = document.createElement("input");
+    teamCheck.type = "checkbox";
+    teamCheck.className = "team-check";
+    teamCheck.dataset.team = teamInfo.team;
+    teamCheck.onclick = (event) => event.stopPropagation();
+    teamCheck.onchange = () => toggleTeamInPlaylist(teamInfo.team, teamCheck.checked);
+
+    const teamName = document.createElement("div");
+    teamName.className = "team-name";
+    teamName.innerHTML = `
+      <span>${teamInfo.team}</span>
+      <span class="team-sub">${teamInfo.sub}</span>
+    `;
+
+    const arrow = document.createElement("span");
+    arrow.className = "arrow";
+    arrow.id = `arrow-${groupIndex}`;
+    arrow.textContent = "▼";
+
+    header.appendChild(teamCheck);
+    header.appendChild(teamName);
+    header.appendChild(arrow);
+
+    const list = document.createElement("div");
+    list.className = "song-list";
+    list.id = `song-list-${groupIndex}`;
+
+    if (tracks.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "song-note";
+      empty.style.padding = "10px";
+      empty.textContent = "登録曲がありません";
+      list.appendChild(empty);
+    }
+
+    tracks.forEach((track) => {
+      const row = document.createElement("div");
+      row.className = "song-row";
+      row.dataset.trackId = track.id;
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.dataset.trackId = track.id;
+      checkbox.onchange = () => toggleSongInPlaylist(track.id, checkbox.checked);
+
+      const text = document.createElement("div");
+      text.innerHTML = `
+        <div class="song-title">${track.title}</div>
+        <div class="song-note">ONで追加 / OFFで削除　音量:${track.volume}</div>
+      `;
+
+      const playButton = document.createElement("button");
+      playButton.type = "button";
+      playButton.className = "small-play";
+      playButton.textContent = "▶";
+      playButton.onclick = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        playSingle(track.id);
+      };
+
+      row.onclick = (event) => {
+        if (event.target.closest("button")) return;
+        if (event.target.closest("input")) return;
+
+        checkbox.checked = !checkbox.checked;
+        toggleSongInPlaylist(track.id, checkbox.checked);
+      };
+
+      row.appendChild(checkbox);
+      row.appendChild(text);
+      row.appendChild(playButton);
+      list.appendChild(row);
+    });
+
+    category.appendChild(header);
+    category.appendChild(list);
+    wrapper.appendChild(category);
+  });
+}
+
+function toggleCategory(index) {
+  const list = document.getElementById(`song-list-${index}`);
+  const header = document.getElementById(`category-header-${index}`);
+  const arrow = document.getElementById(`arrow-${index}`);
+
+  const isOpen = list.style.display === "block";
+
+  list.style.display = isOpen ? "none" : "block";
+  header.classList.toggle("open", !isOpen);
+  arrow.textContent = isOpen ? "▼" : "▲";
+}
+
+function toggleSongInPlaylist(trackId, checked) {
+  const track = findTrack(trackId);
+  if (!track) return;
+
+  if (checked) {
+    if (!playlist.some(item => item.id === trackId)) {
+      playlist.push(track);
+      showToast(`${track.title} を追加しました`);
+    }
+  } else {
+    playlist = playlist.filter(item => item.id !== trackId);
+    showToast(`${track.title} を外しました`);
+  }
+
+  syncAllCheckboxStates();
+  renderPlaylist();
+}
+
+function toggleTeamInPlaylist(team, checked) {
+  const teamTracks = allTracks.filter(track => track.team === team);
+
+  if (checked) {
+    let addedCount = 0;
+
+    teamTracks.forEach(track => {
+      if (!playlist.some(item => item.id === track.id)) {
+        playlist.push(track);
+        addedCount++;
+      }
+    });
+
+    showToast(`${team}の曲を${addedCount}曲追加しました`);
+
+  } else {
+    const beforeCount = playlist.length;
+    playlist = playlist.filter(track => track.team !== team);
+    const removedCount = beforeCount - playlist.length;
+
+    showToast(`${team}の曲を${removedCount}曲外しました`);
+  }
+
+  syncAllCheckboxStates();
+  renderPlaylist();
+}
+
+function syncAllCheckboxStates() {
+  syncTrackCheckboxStates();
+  syncTeamCheckboxStates();
+}
+
+function syncTrackCheckboxStates() {
+  const selectedIds = new Set(playlist.map(track => track.id));
+
+  document.querySelectorAll(".song-row").forEach(row => {
+    const trackId = row.dataset.trackId;
+    const checked = selectedIds.has(trackId);
+    const checkbox = row.querySelector("input[type='checkbox']");
+
+    if (checkbox) {
+      checkbox.checked = checked;
+    }
+
+    row.classList.toggle("selected", checked);
+  });
+}
+
+function syncTeamCheckboxStates() {
+  const selectedIds = new Set(playlist.map(track => track.id));
+
+  document.querySelectorAll(".team-check").forEach(checkbox => {
+    const team = checkbox.dataset.team;
+    const teamTracks = allTracks.filter(track => track.team === team);
+    const selectedCount = teamTracks.filter(track => selectedIds.has(track.id)).length;
+
+    checkbox.disabled = teamTracks.length === 0;
+    checkbox.checked = teamTracks.length > 0 && selectedCount === teamTracks.length;
+    checkbox.indeterminate = selectedCount > 0 && selectedCount < teamTracks.length;
+  });
+}
+
+function renderPlaylist() {
+  const list = document.getElementById("playlist");
+  const emptyMessage = document.getElementById("emptyMessage");
+  const count = document.getElementById("playlistCount");
+
+  list.innerHTML = "";
+
+  playlist.forEach((track, index) => {
+    const li = document.createElement("li");
+    li.className = "playlist-item";
+
+    li.innerHTML = `
+      <span class="playlist-item-title">${index + 1}. ${track.title}</span>
+      <span class="playlist-moves">
+        <button class="move" onclick="movePlaylistItem(${index}, -1)" ${index === 0 ? "disabled" : ""}>↑</button>
+        <button class="move" onclick="movePlaylistItem(${index}, 1)" ${index === playlist.length - 1 ? "disabled" : ""}>↓</button>
+      </span>
+    `;
+
+    list.appendChild(li);
+  });
+
+  count.textContent = `${playlist.length}曲`;
+  emptyMessage.style.display = playlist.length === 0 ? "block" : "none";
+}
+
+function movePlaylistItem(index, direction) {
+  const nextIndex = index + direction;
+
+  if (nextIndex < 0 || nextIndex >= playlist.length) return;
+
+  const temp = playlist[index];
+  playlist[index] = playlist[nextIndex];
+  playlist[nextIndex] = temp;
+
+  renderPlaylist();
+}
+
+function shufflePlaylist() {
+  if (playlist.length < 2) {
+    showToast("2曲以上でランダム入れ替えできます");
+    return;
+  }
+
+  for (let i = playlist.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const temp = playlist[i];
+    playlist[i] = playlist[j];
+    playlist[j] = temp;
+  }
+
+  renderPlaylist();
+  showToast("曲順をランダムにしました");
+}
+
+function clearPlaylist() {
+  playlist = [];
+
+  syncAllCheckboxStates();
+  renderPlaylist();
+  showToast("リストをクリアしました");
+}
+
+function playPlaylist() {
+  if (playlist.length === 0) {
+    showToast("再生リストが空です");
+    return;
+  }
+
+  mode = "playlist";
+  currentPlaylistIndex = 0;
+
+  playCurrentPlaylistItem();
+}
+
+function playCurrentPlaylistItem() {
+  const track = playlist[currentPlaylistIndex];
+
+  if (!track) {
+    stopPlayback();
+    return;
+  }
+
+  setNowPlaying(`${track.title}（リスト再生）`);
+  showToast(`リスト再生: ${track.title}`);
+
+  // 後で音声再生を入れる場所
+  // audio.loop = false;
+  // audio.src = track.file;
+  // audio.volume = track.volume;
+  // audio.play();
+
+  // 音声ファイル実装後は、曲終了時に以下を呼ぶ
+  // playNextPlaylistItem();
+}
+
+function playNextPlaylistItem() {
+  if (mode !== "playlist") return;
+
+  if (playlist.length === 0) {
+    stopPlayback();
+    return;
+  }
+
+  currentPlaylistIndex++;
+
+  if (currentPlaylistIndex >= playlist.length) {
+    currentPlaylistIndex = 0;
+  }
+
+  playCurrentPlaylistItem();
+}
+
+function playSingle(trackId) {
+  const track = findTrack(trackId);
+
+  if (!track) return;
+
+  mode = "single";
+  setNowPlaying(`${track.title}（単品ループ）`);
+  showToast(`単品再生: ${track.title}`);
+
+  // 後で音声再生を入れる場所
+  // audio.loop = true;
+  // audio.src = track.file;
+  // audio.volume = track.volume;
+  // audio.play();
+}
+
+function stopPlayback() {
+  mode = "stopped";
+  currentPlaylistIndex = 0;
+  setNowPlaying("（なし）");
+  showToast("停止しました");
+
+  // 後で音声停止を入れる場所
+  // audio.pause();
+  // audio.currentTime = 0;
+  // audio.loop = false;
+}
+
+function setNowPlaying(text) {
+  document.getElementById("nowPlaying").textContent = text;
+}
+
+function togglePlaylistPanel() {
+  isPlaylistPanelOpen = !isPlaylistPanelOpen;
+
+  const panel = document.getElementById("playlistPanel");
+  const arrow = document.getElementById("playlistArrow");
+
+  panel.classList.toggle("open", isPlaylistPanelOpen);
+  document.body.classList.toggle("playlist-open", isPlaylistPanelOpen);
+  arrow.textContent = isPlaylistPanelOpen ? "▼" : "▲";
+}
+
+function findTrack(trackId) {
+  return allTracks.find(track => track.id === trackId);
+}
+
+let toastTimer = null;
+
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.classList.add("show");
+
+  if (toastTimer) {
+    clearTimeout(toastTimer);
+  }
+
+  toastTimer = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 1200);
+}
+
+document.getElementById("stopBtn").onclick = stopPlayback;
+
+init();
+</script>
+
+</body>
+</html>

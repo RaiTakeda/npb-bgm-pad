@@ -1,0 +1,16 @@
+[
+  {
+    "id": "carp_001",
+    "team": "広島",
+    "title": "広島 応援歌 01",
+    "file": "audio/carp/carp_001.mp3",
+    "volume": 0.85
+  },
+  {
+    "id": "tigers_001",
+    "team": "阪神",
+    "title": "阪神 応援歌 01",
+    "file": "audio/tigers/tigers_001.mp3",
+    "volume": 0.9
+  }
+]
