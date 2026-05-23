@@ -1,10 +1,10 @@
 [
   {
-    "id": "carp_001",
-    "team": "広島",
-    "title": "広島 応援歌 01",
-    "file": "audio/carp/carp_001.mp3",
-    "volume": 0.85
+    "id": "marines_001",
+    "team": "ロッテ",
+    "title": "ロッテ　スキンヘッドランニング",
+    "file": "audio/marines/marines_001.mp3",
+    "volume": 1.0
   },
   {
     "id": "tigers_001",
