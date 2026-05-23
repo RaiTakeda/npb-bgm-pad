@@ -2,15 +2,15 @@
   {
     "id": "marines_001",
     "team": "ロッテ",
-    "title": "ロッテ　スキンヘッドランニング",
+    "title": "M　スキンヘッドランニング",
     "file": "audio/marines/marines_001.mp3",
-    "volume": 1.0
+    "volume": 0.8
   },
   {
-    "id": "tigers_001",
-    "team": "阪神",
-    "title": "阪神 応援歌 01",
-    "file": "audio/tigers/tigers_001.mp3",
-    "volume": 0.9
+    "id": "buffaloes_001",
+    "team": "オリックス",
+    "title": "Bs　ラロッカ",
+    "file": "audio/buffaloes/buffaloes_001.mp3",
+    "volume": 0.8
   }
 ]
