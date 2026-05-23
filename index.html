@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NPB応援歌プレイリスト</title>
+<title>NPB BGM Pad</title>
 
 <style>
 :root{
@@ -88,15 +88,8 @@ h1{
 }
 
 .team-name{
-  display:flex;
-  flex-direction:column;
-  gap:2px;
-}
-
-.team-sub{
-  font-size:11px;
-  color:var(--muted);
-  font-weight:500;
+  font-size:16px;
+  font-weight:700;
 }
 
 .arrow{
@@ -137,12 +130,9 @@ h1{
 .song-title{
   font-size:15px;
   font-weight:600;
-}
-
-.song-note{
-  font-size:11px;
-  color:var(--muted);
-  margin-top:2px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
 button{
@@ -389,8 +379,8 @@ button.move:disabled{
 <body>
 
 <div class="wrap">
-  <h1>NPB応援歌プレイリスト</h1>
-  <p class="hint">チーム横のチェックで一括追加。曲ごとのチェックONで追加、OFFでリストから外します。▶は単品ループ再生用です。</p>
+  <h1>NPB BGM Pad</h1>
+  <p class="hint">チーム横のチェックで一括追加。曲ごとのチェックONで追加、OFFでリストから外します。▶は単品ループ再生です。</p>
 
   <div id="categories"></div>
 </div>
@@ -434,56 +424,56 @@ button.move:disabled{
 
 <script>
 const TEAM_ORDER = [
-  { team: "巨人", sub: "読売ジャイアンツ" },
-  { team: "ヤクルト", sub: "東京ヤクルトスワローズ" },
-  { team: "横浜", sub: "横浜DeNAベイスターズ" },
-  { team: "中日", sub: "中日ドラゴンズ" },
-  { team: "阪神", sub: "阪神タイガース" },
-  { team: "広島", sub: "広島東洋カープ" },
-  { team: "日本ハム", sub: "北海道日本ハムファイターズ" },
-  { team: "楽天", sub: "東北楽天ゴールデンイーグルス" },
-  { team: "西武", sub: "埼玉西武ライオンズ" },
-  { team: "ロッテ", sub: "千葉ロッテマリーンズ" },
-  { team: "オリックス", sub: "オリックス・バファローズ" },
-  { team: "ソフトバンク", sub: "福岡ソフトバンクホークス" }
+  "巨人",
+  "ヤクルト",
+  "横浜",
+  "中日",
+  "阪神",
+  "広島",
+  "日本ハム",
+  "楽天",
+  "西武",
+  "ロッテ",
+  "オリックス",
+  "ソフトバンク"
 ];
 
 const SAMPLE_TRACKS = [
-  { team:"巨人", title:"巨人 応援歌 01", file:"audio/giants/giants01.mp3", volume:1.0 },
-  { team:"巨人", title:"巨人 チャンステーマ", file:"audio/giants/chance01.mp3", volume:0.9 },
+  { id:"giants_001", team:"巨人", title:"巨人 応援歌 01", file:"audio/giants/giants_001.mp3", volume:1.0 },
+  { id:"giants_chance_001", team:"巨人", title:"巨人 チャンステーマ", file:"audio/giants/giants_chance_001.mp3", volume:0.9 },
 
-  { team:"ヤクルト", title:"ヤクルト 応援歌 01", file:"audio/swallows/swallows01.mp3", volume:1.0 },
-  { team:"ヤクルト", title:"ヤクルト チャンステーマ", file:"audio/swallows/chance01.mp3", volume:0.9 },
+  { id:"swallows_001", team:"ヤクルト", title:"ヤクルト 応援歌 01", file:"audio/swallows/swallows_001.mp3", volume:1.0 },
+  { id:"swallows_chance_001", team:"ヤクルト", title:"ヤクルト チャンステーマ", file:"audio/swallows/swallows_chance_001.mp3", volume:0.9 },
 
-  { team:"横浜", title:"横浜 応援歌 01", file:"audio/baystars/baystars01.mp3", volume:1.0 },
-  { team:"横浜", title:"横浜 チャンステーマ", file:"audio/baystars/chance01.mp3", volume:0.9 },
+  { id:"baystars_001", team:"横浜", title:"横浜 応援歌 01", file:"audio/baystars/baystars_001.mp3", volume:1.0 },
+  { id:"baystars_chance_001", team:"横浜", title:"横浜 チャンステーマ", file:"audio/baystars/baystars_chance_001.mp3", volume:0.9 },
 
-  { team:"中日", title:"中日 応援歌 01", file:"audio/dragons/dragons01.mp3", volume:1.0 },
-  { team:"中日", title:"中日 チャンステーマ", file:"audio/dragons/chance01.mp3", volume:0.9 },
+  { id:"dragons_001", team:"中日", title:"中日 応援歌 01", file:"audio/dragons/dragons_001.mp3", volume:1.0 },
+  { id:"dragons_chance_001", team:"中日", title:"中日 チャンステーマ", file:"audio/dragons/dragons_chance_001.mp3", volume:0.9 },
 
-  { team:"阪神", title:"阪神 応援歌 01", file:"audio/tigers/tigers01.mp3", volume:1.0 },
-  { team:"阪神", title:"阪神 チャンステーマ", file:"audio/tigers/chance01.mp3", volume:0.9 },
+  { id:"tigers_001", team:"阪神", title:"阪神 応援歌 01", file:"audio/tigers/tigers_001.mp3", volume:1.0 },
+  { id:"tigers_chance_001", team:"阪神", title:"阪神 チャンステーマ", file:"audio/tigers/tigers_chance_001.mp3", volume:0.9 },
 
-  { team:"広島", title:"広島 応援歌 01", file:"audio/carp/carp01.mp3", volume:1.0 },
-  { team:"広島", title:"広島 チャンステーマ", file:"audio/carp/chance01.mp3", volume:0.85 },
+  { id:"carp_001", team:"広島", title:"広島 応援歌 01", file:"audio/carp/carp_001.mp3", volume:1.0 },
+  { id:"carp_chance_001", team:"広島", title:"広島 チャンステーマ", file:"audio/carp/carp_chance_001.mp3", volume:0.85 },
 
-  { team:"日本ハム", title:"日本ハム 応援歌 01", file:"audio/fighters/fighters01.mp3", volume:1.0 },
-  { team:"日本ハム", title:"日本ハム チャンステーマ", file:"audio/fighters/chance01.mp3", volume:0.9 },
+  { id:"fighters_001", team:"日本ハム", title:"日本ハム 応援歌 01", file:"audio/fighters/fighters_001.mp3", volume:1.0 },
+  { id:"fighters_chance_001", team:"日本ハム", title:"日本ハム チャンステーマ", file:"audio/fighters/fighters_chance_001.mp3", volume:0.9 },
 
-  { team:"楽天", title:"楽天 応援歌 01", file:"audio/eagles/eagles01.mp3", volume:1.0 },
-  { team:"楽天", title:"楽天 チャンステーマ", file:"audio/eagles/chance01.mp3", volume:0.9 },
+  { id:"eagles_001", team:"楽天", title:"楽天 応援歌 01", file:"audio/eagles/eagles_001.mp3", volume:1.0 },
+  { id:"eagles_chance_001", team:"楽天", title:"楽天 チャンステーマ", file:"audio/eagles/eagles_chance_001.mp3", volume:0.9 },
 
-  { team:"西武", title:"西武 応援歌 01", file:"audio/lions/lions01.mp3", volume:1.0 },
-  { team:"西武", title:"西武 チャンステーマ", file:"audio/lions/chance01.mp3", volume:0.9 },
+  { id:"lions_001", team:"西武", title:"西武 応援歌 01", file:"audio/lions/lions_001.mp3", volume:1.0 },
+  { id:"lions_chance_001", team:"西武", title:"西武 チャンステーマ", file:"audio/lions/lions_chance_001.mp3", volume:0.9 },
 
-  { team:"ロッテ", title:"ロッテ 応援歌 01", file:"audio/marines/marines01.mp3", volume:1.0 },
-  { team:"ロッテ", title:"ロッテ チャンステーマ", file:"audio/marines/chance01.mp3", volume:0.9 },
+  { id:"marines_001", team:"ロッテ", title:"ロッテ 応援歌 01", file:"audio/marines/marines_001.mp3", volume:1.0 },
+  { id:"marines_chance_001", team:"ロッテ", title:"ロッテ チャンステーマ", file:"audio/marines/marines_chance_001.mp3", volume:0.9 },
 
-  { team:"オリックス", title:"オリックス 応援歌 01", file:"audio/buffaloes/buffaloes01.mp3", volume:1.0 },
-  { team:"オリックス", title:"オリックス チャンステーマ", file:"audio/buffaloes/chance01.mp3", volume:0.9 },
+  { id:"buffaloes_001", team:"オリックス", title:"オリックス 応援歌 01", file:"audio/buffaloes/buffaloes_001.mp3", volume:1.0 },
+  { id:"buffaloes_chance_001", team:"オリックス", title:"オリックス チャンステーマ", file:"audio/buffaloes/buffaloes_chance_001.mp3", volume:0.9 },
 
-  { team:"ソフトバンク", title:"ソフトバンク 応援歌 01", file:"audio/hawks/hawks01.mp3", volume:1.0 },
-  { team:"ソフトバンク", title:"ソフトバンク チャンステーマ", file:"audio/hawks/chance01.mp3", volume:0.9 }
+  { id:"hawks_001", team:"ソフトバンク", title:"ソフトバンク 応援歌 01", file:"audio/hawks/hawks_001.mp3", volume:1.0 },
+  { id:"hawks_chance_001", team:"ソフトバンク", title:"ソフトバンク チャンステーマ", file:"audio/hawks/hawks_chance_001.mp3", volume:0.9 }
 ];
 
 let allTracks = [];
@@ -492,6 +482,15 @@ let playlist = [];
 let mode = "stopped";
 let currentPlaylistIndex = 0;
 let isPlaylistPanelOpen = false;
+
+const audio = new Audio();
+audio.preload = "auto";
+
+audio.addEventListener("ended", () => {
+  if (mode === "playlist") {
+    playNextPlaylistItem();
+  }
+});
 
 async function init() {
   allTracks = await loadTracks();
@@ -519,31 +518,44 @@ async function loadTracks() {
 
   } catch (error) {
     console.warn("data/tracks.json を読み込めなかったため、サンプルデータで表示します。", error);
+    showToast("tracks.jsonを読めないためサンプル表示です");
     return normalizeTracks(SAMPLE_TRACKS);
   }
 }
 
 function normalizeTracks(rawTracks) {
   return rawTracks.map((track, index) => {
-    const teamInfo = TEAM_ORDER.find(t => t.team === track.team);
+    const safeTeam = track.team || "その他";
 
     return {
-      id: track.id || `${track.team}-${index}`,
-      team: track.team,
-      teamFull: track.teamFull || track.sub || (teamInfo ? teamInfo.sub : ""),
+      id: track.id || `${safeTeam}_${index + 1}`,
+      team: safeTeam,
       title: track.title || `曲 ${index + 1}`,
       file: track.file || "",
-      volume: typeof track.volume === "number" ? track.volume : 1.0
+      volume: normalizeVolume(track.volume)
     };
   });
+}
+
+function normalizeVolume(value) {
+  const num = Number(value);
+
+  if (Number.isNaN(num)) {
+    return 1.0;
+  }
+
+  if (num < 0) return 0;
+  if (num > 1) return 1;
+
+  return num;
 }
 
 function renderCategories() {
   const wrapper = document.getElementById("categories");
   wrapper.innerHTML = "";
 
-  TEAM_ORDER.forEach((teamInfo, groupIndex) => {
-    const tracks = allTracks.filter(track => track.team === teamInfo.team);
+  TEAM_ORDER.forEach((team, groupIndex) => {
+    const tracks = allTracks.filter(track => track.team === team);
 
     const category = document.createElement("div");
     category.className = "category";
@@ -559,16 +571,13 @@ function renderCategories() {
     const teamCheck = document.createElement("input");
     teamCheck.type = "checkbox";
     teamCheck.className = "team-check";
-    teamCheck.dataset.team = teamInfo.team;
+    teamCheck.dataset.team = team;
     teamCheck.onclick = (event) => event.stopPropagation();
-    teamCheck.onchange = () => toggleTeamInPlaylist(teamInfo.team, teamCheck.checked);
+    teamCheck.onchange = () => toggleTeamInPlaylist(team, teamCheck.checked);
 
     const teamName = document.createElement("div");
     teamName.className = "team-name";
-    teamName.innerHTML = `
-      <span>${teamInfo.team}</span>
-      <span class="team-sub">${teamInfo.sub}</span>
-    `;
+    teamName.textContent = team;
 
     const arrow = document.createElement("span");
     arrow.className = "arrow";
@@ -585,7 +594,8 @@ function renderCategories() {
 
     if (tracks.length === 0) {
       const empty = document.createElement("div");
-      empty.className = "song-note";
+      empty.style.color = "var(--muted)";
+      empty.style.fontSize = "13px";
       empty.style.padding = "10px";
       empty.textContent = "登録曲がありません";
       list.appendChild(empty);
@@ -601,11 +611,9 @@ function renderCategories() {
       checkbox.dataset.trackId = track.id;
       checkbox.onchange = () => toggleSongInPlaylist(track.id, checkbox.checked);
 
-      const text = document.createElement("div");
-      text.innerHTML = `
-        <div class="song-title">${track.title}</div>
-        <div class="song-note">ONで追加 / OFFで削除　音量:${track.volume}</div>
-      `;
+      const title = document.createElement("div");
+      title.className = "song-title";
+      title.textContent = track.title;
 
       const playButton = document.createElement("button");
       playButton.type = "button";
@@ -626,7 +634,7 @@ function renderCategories() {
       };
 
       row.appendChild(checkbox);
-      row.appendChild(text);
+      row.appendChild(title);
       row.appendChild(playButton);
       list.appendChild(row);
     });
@@ -740,13 +748,30 @@ function renderPlaylist() {
     const li = document.createElement("li");
     li.className = "playlist-item";
 
-    li.innerHTML = `
-      <span class="playlist-item-title">${index + 1}. ${track.title}</span>
-      <span class="playlist-moves">
-        <button class="move" onclick="movePlaylistItem(${index}, -1)" ${index === 0 ? "disabled" : ""}>↑</button>
-        <button class="move" onclick="movePlaylistItem(${index}, 1)" ${index === playlist.length - 1 ? "disabled" : ""}>↓</button>
-      </span>
-    `;
+    const title = document.createElement("span");
+    title.className = "playlist-item-title";
+    title.textContent = `${index + 1}. ${track.title}`;
+
+    const moves = document.createElement("span");
+    moves.className = "playlist-moves";
+
+    const up = document.createElement("button");
+    up.className = "move";
+    up.textContent = "↑";
+    up.disabled = index === 0;
+    up.onclick = () => movePlaylistItem(index, -1);
+
+    const down = document.createElement("button");
+    down.className = "move";
+    down.textContent = "↓";
+    down.disabled = index === playlist.length - 1;
+    down.onclick = () => movePlaylistItem(index, 1);
+
+    moves.appendChild(up);
+    moves.appendChild(down);
+
+    li.appendChild(title);
+    li.appendChild(moves);
 
     list.appendChild(li);
   });
@@ -764,6 +789,16 @@ function movePlaylistItem(index, direction) {
   playlist[index] = playlist[nextIndex];
   playlist[nextIndex] = temp;
 
+  if (mode === "playlist") {
+    const currentTrack = getCurrentAudioTrack();
+    if (currentTrack) {
+      const newIndex = playlist.findIndex(track => track.id === currentTrack.id);
+      if (newIndex !== -1) {
+        currentPlaylistIndex = newIndex;
+      }
+    }
+  }
+
   renderPlaylist();
 }
 
@@ -773,11 +808,20 @@ function shufflePlaylist() {
     return;
   }
 
+  const currentTrack = getCurrentAudioTrack();
+
   for (let i = playlist.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     const temp = playlist[i];
     playlist[i] = playlist[j];
     playlist[j] = temp;
+  }
+
+  if (mode === "playlist" && currentTrack) {
+    const newIndex = playlist.findIndex(track => track.id === currentTrack.id);
+    if (newIndex !== -1) {
+      currentPlaylistIndex = newIndex;
+    }
   }
 
   renderPlaylist();
@@ -786,6 +830,10 @@ function shufflePlaylist() {
 
 function clearPlaylist() {
   playlist = [];
+
+  if (mode === "playlist") {
+    stopPlayback(false);
+  }
 
   syncAllCheckboxStates();
   renderPlaylist();
@@ -813,16 +861,7 @@ function playCurrentPlaylistItem() {
   }
 
   setNowPlaying(`${track.title}（リスト再生）`);
-  showToast(`リスト再生: ${track.title}`);
-
-  // 後で音声再生を入れる場所
-  // audio.loop = false;
-  // audio.src = track.file;
-  // audio.volume = track.volume;
-  // audio.play();
-
-  // 音声ファイル実装後は、曲終了時に以下を呼ぶ
-  // playNextPlaylistItem();
+  playTrack(track, false);
 }
 
 function playNextPlaylistItem() {
@@ -848,26 +887,59 @@ function playSingle(trackId) {
   if (!track) return;
 
   mode = "single";
-  setNowPlaying(`${track.title}（単品ループ）`);
-  showToast(`単品再生: ${track.title}`);
+  currentPlaylistIndex = 0;
 
-  // 後で音声再生を入れる場所
-  // audio.loop = true;
-  // audio.src = track.file;
-  // audio.volume = track.volume;
-  // audio.play();
+  setNowPlaying(`${track.title}（単品ループ）`);
+  playTrack(track, true);
 }
 
-function stopPlayback() {
+function playTrack(track, loop) {
+  if (!track.file) {
+    showToast("音声ファイルが未設定です");
+    return;
+  }
+
+  audio.pause();
+  audio.currentTime = 0;
+  audio.loop = loop;
+  audio.src = track.file;
+  audio.volume = normalizeVolume(track.volume);
+
+  audio.dataset.trackId = track.id;
+
+  const playPromise = audio.play();
+
+  if (playPromise && typeof playPromise.catch === "function") {
+    playPromise.catch((error) => {
+      console.error("audio.play() failed:", error);
+      showToast("音声を再生できませんでした");
+    });
+  }
+}
+
+function stopPlayback(showMessage = true) {
   mode = "stopped";
   currentPlaylistIndex = 0;
-  setNowPlaying("（なし）");
-  showToast("停止しました");
 
-  // 後で音声停止を入れる場所
-  // audio.pause();
-  // audio.currentTime = 0;
-  // audio.loop = false;
+  audio.pause();
+  audio.currentTime = 0;
+  audio.loop = false;
+  audio.removeAttribute("src");
+  audio.load();
+  delete audio.dataset.trackId;
+
+  setNowPlaying("（なし）");
+
+  if (showMessage) {
+    showToast("停止しました");
+  }
+}
+
+function getCurrentAudioTrack() {
+  const trackId = audio.dataset.trackId;
+  if (!trackId) return null;
+
+  return findTrack(trackId);
 }
 
 function setNowPlaying(text) {
@@ -905,7 +977,7 @@ function showToast(message) {
   }, 1200);
 }
 
-document.getElementById("stopBtn").onclick = stopPlayback;
+document.getElementById("stopBtn").onclick = () => stopPlayback();
 
 init();
 </script>
